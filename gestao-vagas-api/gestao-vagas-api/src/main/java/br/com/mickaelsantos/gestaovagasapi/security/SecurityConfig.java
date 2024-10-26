@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,6 +19,13 @@ public class SecurityConfig
     @Autowired
     private SecurityCandidateFilter securityCandidateFilter;
 
+
+    private static final String[] SWAGGER_LIST = {
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "swagger-resources/**"
+    };
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
@@ -27,7 +33,8 @@ public class SecurityConfig
             auth.requestMatchers("/candidate/register").permitAll()
             .requestMatchers("/authCandidate/auth").permitAll()
             .requestMatchers("/authCompany/auth").permitAll()
-            .requestMatchers("/company/register").permitAll();
+            .requestMatchers("/company/register").permitAll()
+            .requestMatchers(SWAGGER_LIST).permitAll();
             
             auth.anyRequest().authenticated(); 
         })

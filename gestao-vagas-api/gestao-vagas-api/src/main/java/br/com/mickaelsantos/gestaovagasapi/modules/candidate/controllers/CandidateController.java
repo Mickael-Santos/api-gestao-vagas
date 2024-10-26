@@ -15,17 +15,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import br.com.mickaelsantos.gestaovagasapi.modules.candidate.dto.ProfileCandidateResponseDTO;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.models.Candidate;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases.CreateCandidate;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases.ListAllJobsByFilterUseCase;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases.ProfileCandidateUseCase;
 import br.com.mickaelsantos.gestaovagasapi.modules.company.models.Job;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/candidate")
 
+@Tag(name = "Candidato", description = "Informações do candidato")
 public class CandidateController 
 {
     @Autowired
@@ -38,6 +48,18 @@ public class CandidateController
     private ListAllJobsByFilterUseCase listAllJobsByFilterUseCase;
 
     @PostMapping("/register")
+    @Operation(summary = "Cadastro de candidatos", 
+    description = "Endpoint para cadastro de candidatos")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", content = {
+
+            @Content(
+                schema = @Schema(implementation = Candidate.class)
+            )
+        }),
+        @ApiResponse(responseCode = "400", description = "Usuário já existe")
+    })
+    @SecurityRequirement(name = "jwt_auth")
     public ResponseEntity<Object> create(@Valid @RequestBody Candidate candidate)
     {
         try
@@ -54,6 +76,21 @@ public class CandidateController
 
     @GetMapping("/profile")
     @PreAuthorize("hasRole('CANDIDATE')")
+    @Operation(summary = "Listagem do candidato",
+    description = "Listagem as informações do candidato")
+    @ApiResponses
+    (
+        {
+            @ApiResponse(responseCode = "200", content = {
+                @Content
+                (
+                    array = @ArraySchema( schema = @Schema(implementation = Candidate.class))
+                )
+            }),
+            @ApiResponse(responseCode = "400", description = "Usuário não encontrado")
+        }
+    )
+    @SecurityRequirement(name = "jwt_auth")
     public ResponseEntity<Object> get(HttpServletRequest request)
     {
         try
@@ -73,6 +110,18 @@ public class CandidateController
 
     @GetMapping("/jobs")
     @PreAuthorize("hasRole('CANDIDATE')")
+    @Operation(
+        summary = "Listagem das vagas conforme o filtro informado", 
+        description = "Esse endpoint é responsável por listar todas vagas disponíveis conforme o filtro informado")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", content = {
+            @Content
+            (
+                array = @ArraySchema(schema = @Schema(implementation = Job.class))
+            )
+        })
+    })
+    @SecurityRequirement(name = "jwt_auth")
     public List<Job> findJobsByFilter(@RequestParam("filter") String filter)
     {
         return listAllJobsByFilterUseCase.execute(filter);
