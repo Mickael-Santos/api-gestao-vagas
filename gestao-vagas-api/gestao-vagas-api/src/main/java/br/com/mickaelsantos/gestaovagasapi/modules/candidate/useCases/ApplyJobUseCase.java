@@ -22,12 +22,12 @@ public class ApplyJobUseCase
     public void execute(UUID jobUuId, UUID candidateUuId)
     {
 
-        var candidate = candidateRepository.findByUuid(candidateUuId)
+        this.candidateRepository.findById(candidateUuId)
         .orElseThrow(() -> {
             throw new CandidateNotFoundException();
         });
 
-        var job = jobRepository.findById(jobUuId)
+        this.jobRepository.findById(jobUuId)
         .orElseThrow( () -> {
             throw new JobNotFoundException();
         } );
