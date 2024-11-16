@@ -3,7 +3,6 @@ package br.com.mickaelsantos.gestaovagasapi.modules.candidate.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import br.com.mickaelsantos.gestaovagasapi.modules.candidate.dto.ProfileCandidateResponseDTO;
+import br.com.mickaelsantos.gestaovagasapi.modules.candidate.models.ApplyJob;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.models.Candidate;
+import br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases.ApplyJobUseCase;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases.CreateCandidate;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases.ListAllJobsByFilterUseCase;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases.ProfileCandidateUseCase;
@@ -46,6 +45,9 @@ public class CandidateController
 
     @Autowired
     private ListAllJobsByFilterUseCase listAllJobsByFilterUseCase;
+
+    @Autowired
+    private ApplyJobUseCase applyJobUseCase;
 
     @PostMapping("/register")
     @Operation(summary = "Cadastro de candidatos", 
@@ -125,5 +127,40 @@ public class CandidateController
     public List<Job> findJobsByFilter(@RequestParam("filter") String filter)
     {
         return listAllJobsByFilterUseCase.execute(filter);
+    }
+
+    @PostMapping("/job/apply")
+    @PreAuthorize("hasRole('CANDIDATE')")
+    @Operation(
+        summary = "Aplicação de um candidato a uma vaga disponível",
+        description = "Esse endpoint permite fazer a aplicação de um candidato a uma nova vaga"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", content = {
+            @Content
+            (
+                schema = @Schema(implementation = ApplyJob.class)
+            )
+        })
+    })
+    @SecurityRequirement(name = "jwt_auth")
+
+    public ResponseEntity<Object> applyJob(@RequestBody UUID job, HttpServletRequest request)
+    {
+        try
+        {
+            var result = applyJobUseCase.execute(job, 
+                UUID.fromString(
+                    request.getAttribute("candidate_id").toString()
+                )
+            );
+            return ResponseEntity.ok().body(result);
+
+        }
+        catch(Exception ex)
+        {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+
     }
 }
