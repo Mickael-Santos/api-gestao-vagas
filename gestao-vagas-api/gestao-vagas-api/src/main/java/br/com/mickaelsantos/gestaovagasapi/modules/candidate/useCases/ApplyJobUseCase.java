@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import br.com.mickaelsantos.gestaovagasapi.exceptions.CandidateNotFoundException;
 import br.com.mickaelsantos.gestaovagasapi.exceptions.JobNotFoundException;
+import br.com.mickaelsantos.gestaovagasapi.modules.candidate.Repositories.ApplyJobRepository;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.Repositories.CandidateRepository;
+import br.com.mickaelsantos.gestaovagasapi.modules.candidate.models.ApplyJob;
 import br.com.mickaelsantos.gestaovagasapi.modules.company.repositories.JobRepository;
 
 @Service
@@ -19,9 +21,12 @@ public class ApplyJobUseCase
     @Autowired
     private CandidateRepository candidateRepository;
 
-    public void execute(UUID jobUuId, UUID candidateUuId)
-    {
+    @Autowired
+    private ApplyJobRepository applyJobRepository;
 
+    public ApplyJob execute(UUID jobUuId, UUID candidateUuId)
+    {
+        
         this.candidateRepository.findById(candidateUuId)
         .orElseThrow(() -> {
             throw new CandidateNotFoundException();
@@ -31,5 +36,13 @@ public class ApplyJobUseCase
         .orElseThrow( () -> {
             throw new JobNotFoundException();
         } );
+
+        var applyJob = ApplyJob.builder()
+        .candidateUuId(candidateUuId)
+        .jobUuId(jobUuId).build();
+
+        var savedApplyJob = applyJobRepository.save(applyJob);
+
+        return savedApplyJob;
     }
 }
