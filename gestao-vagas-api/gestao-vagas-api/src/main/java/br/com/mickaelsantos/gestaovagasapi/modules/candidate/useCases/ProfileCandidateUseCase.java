@@ -3,9 +3,9 @@ package br.com.mickaelsantos.gestaovagasapi.modules.candidate.useCases;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import br.com.mickaelsantos.gestaovagasapi.exceptions.UserNotFoundException;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.Repositories.CandidateRepository;
 import br.com.mickaelsantos.gestaovagasapi.modules.candidate.dto.ProfileCandidateResponseDTO;
 
@@ -19,7 +19,7 @@ public class ProfileCandidateUseCase
    {
         var candidate = candidateRepository.findByUuid(uuIdCandidate)
         .orElseThrow(() ->{
-            throw new UsernameNotFoundException("User does not exist or incorrect uuid");
+            throw new UserNotFoundException();
         });
 
         var candidateDTO = ProfileCandidateResponseDTO.builder()

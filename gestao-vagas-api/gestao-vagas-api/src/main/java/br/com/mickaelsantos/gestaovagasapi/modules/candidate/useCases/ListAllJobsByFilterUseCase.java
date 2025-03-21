@@ -13,6 +13,7 @@ public class ListAllJobsByFilterUseCase
 {
     @Autowired
     private JobRepository jobRepository;
+    
 
     public List<Job> execute(String filter)
     {

@@ -66,6 +66,18 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+		    <groupId>io.micrometer</groupId>
+		    <artifactId>micrometer-registry-prometheus</artifactId>
+			<version>1.12.0</version>
+		</dependency>
+
 		<!-- Repositório Lombok - https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 		    <groupId>org.projectlombok</groupId>
@@ -81,6 +93,25 @@
 		    <version>2.2.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.2.224</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -88,6 +119,37 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+			  <groupId>org.sonarsource.scanner.maven</groupId>
+			  <artifactId>sonar-maven-plugin</artifactId>
+			  <version>3.10.0.2594</version>
+			</plugin>
+
+			<plugin>
+			  <groupId>org.jacoco</groupId>
+			  <artifactId>jacoco-maven-plugin</artifactId>
+			  <version>0.8.7</version>
+			  <executions>
+			    <execution>
+			      <id>prepare-agent</id>
+			      <goals>
+			        <goal>prepare-agent</goal>
+			      </goals>
+			    </execution>
+			    <execution>
+			      <id>report</id>
+			      <goals>
+			        <goal>report</goal>
+			      </goals>
+			      <configuration>
+			        <formats>
+			          <format>XML</format>
+			        </formats>
+			      </configuration>
+			    </execution>
+			  </executions>
 			</plugin>
 		</plugins>
 	</build>
